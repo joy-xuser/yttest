@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agomoni Sur - Durga Puja Special</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #0c0703;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(rgba(10, 5, 2, 0.72), rgba(15, 6, 2, 0.85)), 
+                        radial-gradient(circle at 20% 30%, rgba(255, 140, 0, 0.18) 0%, transparent 60%),
+                        url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .bengali-text {
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        .golden-glass {
+            background: linear-gradient(135deg, rgba(60, 30, 10, 0.75) 0%, rgba(15, 8, 2, 0.9) 100%);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 170, 60, 0.28);
+            border-top: 1px solid rgba(255, 210, 100, 0.55);
+            border-left: 1px solid rgba(255, 190, 80, 0.45);
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.75), 
+                0 0 35px rgba(249, 115, 22, 0.22), 
+                inset 0 1px 15px rgba(255, 180, 80, 0.18);
+        }
+
+        /* Custom Scrollbar for Playlist */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .progress-bar-container {
+            position: relative;
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .progress-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #FF8C00, #FFB75E);
+            border-radius: 4px;
+            width: 0%;
+        }
+        
+        .progress-bar-thumb {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 13px;
+            height: 13px;
+            background: #FFE4B5;
+            border-radius: 50%;
+            left: 0%;
+            box-shadow: 0 0 8px rgba(255, 140, 0, 0.8);
+        }
+
+        .playlist-item {
+            transition: all 0.2s ease;
+        }
+        
+        .playlist-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .playlist-item.active {
+            background: linear-gradient(90deg, rgba(255, 140, 0, 0.25) 0%, transparent 100%);
+            border-left: 3px solid #f97316;
+        }
+
+        .live-dot {
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.35; }
+            100% { opacity: 1; }
+        }
+
+        .main-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay for better text readability -->
+    <div class="absolute inset-0 bg-black/25 z-0 pointer-events-none"></div>
+
+    <div class="main-content-wrapper z-10 w-full h-full p-4 md:p-6 lg:p-8 flex flex-col justify-between">
+        
+        <!-- Top bar with user profile/admin button -->
+        <div class="w-full flex justify-end items-center z-20">
+            <button id="open-passcode-modal" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-[#ffaa3c]/30 text-[#ffb866] hover:text-white flex items-center justify-center transition-all shadow-lg active:scale-95" title="Admin Access">
+                <i class="fas fa-user text-base"></i>
+            </button>
+        </div>
+
+        <!-- Middle Section: Playlist on the right -->
+        <div class="flex-grow flex items-center justify-end w-full mt-4 lg:mt-0 relative z-20">
+            
+            <!-- Playlist Container -->
+            <div class="golden-glass rounded-[1.5rem] w-full lg:w-[415px] flex flex-col h-[60vh] max-h-[460px] overflow-hidden mr-0 lg:mr-8 transition-all duration-300 shadow-2xl relative" id="playlist-container">
+                
+                <!-- Category Drawer (Slide-in Menu) -->
+                <div id="playlist-category-drawer" class="absolute top-0 left-0 w-[68%] h-full bg-gradient-to-br from-[#3c1e0a]/98 to-[#1a0a00]/98 backdrop-blur-2xl border-r border-[#ffb450]/20 transform -translate-x-full transition-transform duration-300 ease-out z-30 flex flex-col shadow-[15px_0_30px_rgba(0,0,0,0.6)]">
+                    <div class="px-5 py-4 flex items-center justify-between border-b border-white/10 mt-2">
+                        <h4 class="font-bold text-[13px] tracking-widest text-[#ffb866]">CATEGORIES</h4>
+                        <button id="close-category-drawer" class="text-gray-400 hover:text-white w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="flex-grow overflow-y-auto px-3 py-2 space-y-1">
+                        <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-[#ff9d33] transition-colors font-medium flex justify-between items-center group" onclick="selectCategory('Mahalaya')">
+                            Mahalaya <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </button>
+                        <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-[#ff9d33] transition-colors font-medium flex justify-between items-center group" onclick="selectCategory('Shasthi')">
+                            Shasthi <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </button>
+                        <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-[#ff9d33] transition-colors font-medium flex justify-between items-center group" onclick="selectCategory('Saptami')">
+                            Saptami <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </button>
+                        <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-[#ff9d33] transition-colors font-medium flex justify-between items-center group" onclick="selectCategory('Ashtami')">
+                            Ashtami <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </button>
+                        <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-[#ff9d33] transition-colors font-medium flex justify-between items-center group" onclick="selectCategory('Navami')">
+                            Navami <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </button>
+                        <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-[#ff9d33] transition-colors font-medium flex justify-between items-center group" onclick="selectCategory('Dashami')">
+                            Dashami <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </button>
+                        <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-[#ff9d33] transition-colors font-medium flex justify-between items-center group" onclick="selectCategory('All Tracks')">
+                            All Tracks <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Playlist Header -->
+                <div class="px-6 py-4 flex justify-between items-center bg-transparent mt-2 relative z-20">
+                    <div class="flex items-center gap-2.5 cursor-pointer group hover:bg-white/5 px-3 py-1.5 -ml-3 rounded-lg transition-colors" id="open-category-drawer" title="View Categories">
+                        <i class="fas fa-list-ul text-[#ff9d33]"></i>
+                        <h3 class="font-bold text-[13px] tracking-[0.15em] text-[#ffb866] group-hover:text-white transition-colors" id="playlist-main-title">PLAYLIST (0)</h3>
+                        <i class="fas fa-chevron-right text-[#ffb866] text-[10px] opacity-70 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                    <button id="toggle-playlist" class="text-[12px] font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 px-3.5 py-1.5 rounded-full border border-white/10 transition-colors flex items-center gap-2">
+                        <i class="fas fa-chevron-up transition-transform duration-300" id="playlist-icon"></i>
+                        <span id="playlist-toggle-text">Hide List</span>
+                    </button>
+                </div>
+
+                <!-- Playlist Items -->
+                <div class="overflow-y-auto flex-grow px-3 pb-3 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent" id="playlist-items">
+                    <!-- Dynamic Tracks injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section: Player -->
+        <div class="w-full flex justify-center z-20 mt-4 pb-4">
+            
+            <!-- Player Control Bar -->
+            <div class="golden-glass rounded-[2rem] w-full lg:w-[1000px] p-3 pr-6 flex flex-col lg:flex-row items-center justify-between relative gap-6 lg:gap-8 mx-auto">
+                
+                <!-- Left: Album Art & Track Info (Including Progress) -->
+                <div class="flex items-center gap-5 w-full lg:w-[60%] flex-shrink-0 min-w-0 pl-1">
+                    <div class="relative shrink-0">
+                        <img 
+                            src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&auto=format&fit=crop&q=80" 
+                            alt="Album Art" 
+                            id="current-album-art" 
+                            class="w-[90px] h-[90px] rounded-[1rem] object-cover shadow-lg border border-white/10 shrink-0 transition-all duration-300"
+                            onerror="this.src='https://placehold.co/150x150/3c1e0a/ffb450?text=Music'"
+                        />
+                        <div id="art-loader" class="absolute inset-0 bg-black/60 backdrop-blur-[2px] rounded-[1rem] flex items-center justify-center hidden">
+                            <i class="fas fa-circle-notch fa-spin text-[#ffaa3c] text-xl"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col justify-center w-full min-w-0 py-1">
+                        <!-- LIVE Badge -->
+                        <div class="flex items-center gap-2 mb-1.5 bg-[#521313] px-2.5 py-0.5 rounded-full w-fit">
+                            <div class="w-1.5 h-1.5 bg-red-500 rounded-full live-dot shadow-[0_0_5px_rgba(239,68,68,0.8)]"></div>
+                            <span class="text-[10px] font-bold text-white tracking-widest">LIVE</span>
+                        </div>
+                        
+                        <!-- Track Details -->
+                        <h4 class="font-semibold text-white text-[17px] tracking-wide truncate mb-0.5" id="current-track-title">গান যোগ করুন</h4>
+                        <span class="text-[13px] text-gray-300 truncate mb-4" id="current-track-artist">শিল্পী নির্বাচন নেই</span>
+                        
+                        <!-- Progress Bar & Timestamps -->
+                        <div class="w-full relative">
+                            <div class="progress-bar-container h-[5px] bg-white/10 rounded-full relative cursor-pointer w-full" id="progress-container">
+                                <div class="progress-bar-fill absolute top-0 left-0 h-full bg-gradient-to-r from-[#FF8C00] to-[#FFB75E] rounded-full" id="progress-fill" style="width: 0%;"></div>
+                                <div class="progress-bar-thumb absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-[#FFE4B5] rounded-full shadow-[0_0_8px_rgba(255,140,0,0.6)]" id="progress-thumb" style="left: 0%;"></div>
+                            </div>
+                            <div class="flex justify-between items-center w-full mt-2 px-0.5">
+                                <span class="text-[11px] text-gray-300 font-medium tracking-wide" id="current-time">00:00</span>
+                                <span class="text-[11px] text-gray-300 font-medium tracking-wide" id="total-time">00:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center: Main Controls -->
+                <div class="flex items-center justify-center gap-3 md:gap-4 shrink-0">
+                    <button class="w-[36px] h-[36px] rounded-full text-gray-400 hover:text-white transition-colors flex items-center justify-center" id="shuffle-btn" title="Shuffle: বন্ধ">
+                        <i class="fas fa-shuffle text-xs"></i>
+                    </button>
+                    <button class="w-[42px] h-[42px] rounded-full bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-white transition-colors shadow-inner active:scale-95" id="prev-btn" title="Previous">
+                        <i class="fas fa-backward-step text-sm"></i>
+                    </button>
+                    <button class="w-[56px] h-[56px] rounded-full bg-gradient-to-b from-[#FFA751] to-[#E65C00] hover:scale-105 active:scale-95 text-white flex items-center justify-center shadow-[0_4px_15px_rgba(230,92,0,0.3)] transition-transform" id="play-pause-btn" title="Play / Pause">
+                        <i class="fas fa-play text-xl ml-0.5"></i>
+                    </button>
+                    <button class="w-[42px] h-[42px] rounded-full bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-white transition-colors shadow-inner active:scale-95" id="next-btn" title="Next">
+                        <i class="fas fa-forward-step text-sm"></i>
+                    </button>
+                    <button class="w-[36px] h-[36px] rounded-full text-[#ffb866] hover:text-white transition-colors flex items-center justify-center relative" id="repeat-btn" title="Repeat: সব গান">
+                        <i class="fas fa-repeat text-xs" id="repeat-icon"></i>
+                    </button>
+                </div>
+
+                <!-- Right: Volume & Mute (Shifted 1cm left) -->
+                <div class="flex items-center justify-end gap-3 shrink-0 mr-4 lg:mr-8 pr-6 w-[170px]">
+                    <i class="fas fa-volume-up text-gray-300 text-sm cursor-pointer hover:text-white transition-colors" id="mute-icon" title="Mute / Unmute"></i>
+                    <div class="w-[85px] h-[5px] bg-white/20 rounded-full relative cursor-pointer py-1" id="volume-container">
+                        <div class="absolute top-1/2 -translate-y-1/2 left-0 h-[5px] bg-gradient-to-r from-[#FF8C00] to-[#FFB75E] rounded-full pointer-events-none" id="volume-fill" style="width: 100%;"></div>
+                        <div class="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-[#FFE4B5] rounded-full shadow-[0_0_6px_rgba(255,140,0,0.8)] pointer-events-none" id="volume-thumb" style="left: 100%;"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PASSCODE VERIFICATION (47842828) -->
+    <div id="passcode-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="golden-glass w-full max-w-xs rounded-3xl p-6 border border-[#ffaa3c]/40 shadow-2xl relative text-center">
+            <button id="close-passcode-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="w-12 h-12 mx-auto rounded-full bg-[#ff9d33]/20 border border-[#ffaa3c]/40 flex items-center justify-center text-[#ffb866] mb-3">
+                <i class="fas fa-lock text-lg"></i>
+            </div>
+            <h3 class="text-base font-bold text-white mb-1">প্রবেশ পাসকোড দিন</h3>
+            <p class="text-xs text-gray-400 mb-4">অ্যাডমিন অ্যাক্সেসের জন্য পাসকোড লিখুন</p>
+            <form id="passcode-form" class="space-y-3">
+                <input type="password" id="input-passcode" placeholder="পাসকোড দিন" maxlength="12" class="w-full text-center tracking-widest bg-black/50 border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff9d33] transition-colors" autocomplete="off">
+                <p id="passcode-error" class="text-xs text-red-400 hidden">ভুল পাসকোড! আবার চেষ্টা করুন।</p>
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-[#FF8C00] to-[#E65C00] hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-lg transition-transform active:scale-[0.98]">
+                    যাচাই করুন
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD SONG / PLAYLIST POPUP -->
+    <div id="add-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="golden-glass w-full max-w-md rounded-3xl p-6 border border-[#ffaa3c]/40 shadow-2xl relative">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-[#ffb866] flex items-center gap-2">
+                    <i class="fas fa-layer-group"></i> গান / প্লেলিস্ট যোগ করুন
+                </h3>
+                <button id="close-add-modal" class="text-gray-400 hover:text-white w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/10">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex rounded-xl bg-black/40 p-1 mb-4 border border-white/10 gap-1">
+                <button type="button" id="tab-single-btn" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-white bg-gradient-to-r from-[#FF8C00] to-[#E65C00] shadow transition-all">
+                    একক গান
+                </button>
+                <button type="button" id="tab-playlist-btn" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition-all">
+                    YouTube প্লেলিস্ট
+                </button>
+                <button type="button" id="tab-bulk-btn" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition-all">
+                    একাধিক লিংক
+                </button>
+            </div>
+
+            <!-- Form 1: Single Track -->
+            <form id="add-song-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">YouTube বা MP3 লিংক</label>
+                    <input type="url" id="input-song-url" required placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff9d33] transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">গানের নাম (Title)</label>
+                    <input type="text" id="input-song-title" required placeholder="যেমন: Chandipath বা Dugga Elo" class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff9d33] transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">শিল্পী (Artist)</label>
+                    <input type="text" id="input-song-artist" required placeholder="যেমন: Birendra Krishna Bhadra" class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff9d33] transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">ক্যাটাগরি (Category)</label>
+                    <select id="input-song-category" class="w-full bg-[#201005] border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff9d33] transition-colors">
+                        <option value="Mahalaya">Mahalaya</option>
+                        <option value="Shasthi">Shasthi</option>
+                        <option value="Saptami">Saptami</option>
+                        <option value="Ashtami">Ashtami</option>
+                        <option value="Navami">Navami</option>
+                        <option value="Dashami">Dashami</option>
+                    </select>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-[#FF8C00] to-[#E65C00] hover:opacity-95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98]">
+                        গানটি প্লেলিস্টে সেভ করুন
+                    </button>
+                </div>
+            </form>
+
+            <!-- Form 2: Entire YouTube Playlist Import -->
+            <form id="add-playlist-form" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">YouTube Playlist লিংক বা ID</label>
+                    <input type="text" id="input-playlist-url" required placeholder="https://www.youtube.com/playlist?list=PL..." class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff9d33] transition-colors">
+                    <p class="text-[11px] text-gray-400 mt-1">পাবলিক বা আনলিস্টেড ইউটিউব প্লেলিস্টের পুরো লিঙ্ক পেস্ট করুন।</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">কোন ক্যাটাগরিতে যোগ হবে?</label>
+                    <select id="input-playlist-category" class="w-full bg-[#201005] border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff9d33] transition-colors">
+                        <option value="Mahalaya">Mahalaya</option>
+                        <option value="Shasthi" selected>Shasthi</option>
+                        <option value="Saptami">Saptami</option>
+                        <option value="Ashtami">Ashtami</option>
+                        <option value="Navami">Navami</option>
+                        <option value="Dashami">Dashami</option>
+                    </select>
+                </div>
+
+                <div id="playlist-status-msg" class="text-xs text-center py-2.5 px-3 rounded-lg bg-black/40 border border-white/10 hidden font-medium transition-all"></div>
+
+                <div class="pt-2">
+                    <button type="submit" id="btn-fetch-playlist" class="w-full py-3 bg-gradient-to-r from-[#FF8C00] to-[#E65C00] hover:opacity-95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2">
+                        <i class="fas fa-cloud-arrow-down"></i> সব গান ফেচ করে যুক্ত করুন
+                    </button>
+                </div>
+            </form>
+
+            <!-- Form 3: Bulk YouTube Links Import -->
+            <form id="add-bulk-form" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">একাধিক ইউটিউব লিংক (প্রতি লাইনে ১টি)</label>
+                    <textarea id="input-bulk-links" rows="4" required placeholder="https://youtu.be/...&#10;https://www.youtube.com/watch?v=..." class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-[#ff9d33] transition-colors"></textarea>
+                    <p class="text-[11px] text-gray-400 mt-1">কয়েকটি গানের লিংক একসাথে পেস্ট করে এক ক্লিকে অ্যাড করুন।</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">কোন ক্যাটাগরিতে যোগ হবে?</label>
+                    <select id="input-bulk-category" class="w-full bg-[#201005] border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff9d33] transition-colors">
+                        <option value="Mahalaya">Mahalaya</option>
+                        <option value="Shasthi" selected>Shasthi</option>
+                        <option value="Saptami">Saptami</option>
+                        <option value="Ashtami">Ashtami</option>
+                        <option value="Navami">Navami</option>
+                        <option value="Dashami">Dashami</option>
+                    </select>
+                </div>
+
+                <div id="bulk-status-msg" class="text-xs text-center py-2.5 px-3 rounded-lg bg-black/40 border border-white/10 hidden font-medium transition-all"></div>
+
+                <div class="pt-2">
+                    <button type="submit" id="btn-fetch-bulk" class="w-full py-3 bg-gradient-to-r from-[#FF8C00] to-[#E65C00] hover:opacity-95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2">
+                        <i class="fas fa-list-check"></i> সব লিংক ইমপোর্ট করুন
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================
+           প্লেলিস্ট ডাটা এবং লোকাল স্টোরেজ সিঙ্ক
+           ========================================================== */
+        const playlistsData = {
+            'Mahalaya': [],
+            'Shasthi': [],
+            'Saptami': [],
+            'Ashtami': [],
+            'Navami': [],
+            'Dashami': [],
+            'All Tracks': []
+        };
+
+        const savedTracks = localStorage.getItem('agomoni_user_tracks');
+        if (savedTracks) {
+            try {
+                const parsed = JSON.parse(savedTracks);
+                for (const cat in parsed) {
+                    if (playlistsData[cat]) {
+                        playlistsData[cat] = parsed[cat];
+                    }
+                }
+            } catch(e) {
+                console.error("Error loading local tracks", e);
+            }
+        }
+
+        function refreshAllTracks() {
+            let combined = [];
+            for (const cat in playlistsData) {
+                if (cat !== 'All Tracks') {
+                    combined = combined.concat(playlistsData[cat]);
+                }
+            }
+            playlistsData['All Tracks'] = combined;
+        }
+        refreshAllTracks();
+
+        /* ==========================================================
+           বিজ্ঞাপনহীন সরাসরি অডিও ইঞ্জিন (PURE NATIVE HTML5 AUDIO)
+           ========================================================== */
+        const audio = new Audio();
+        audio.preload = 'auto';
+
+        let currentVolume = 1;
+        let isMuted = false;
+
+        let currentPlaylistName = 'All Tracks';
+        let tracks = playlistsData[currentPlaylistName];
+        let currentTrackId = tracks.length > 0 ? tracks[0].id : null;
+        let isPlaying = false; 
+
+        let isShuffle = false;
+        let repeatMode = 'all'; // 'all', 'one', 'off'
+
+        // UI রেফারেন্স
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const playIcon = playPauseBtn.querySelector('i');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const repeatBtn = document.getElementById('repeat-btn');
+        const repeatIcon = document.getElementById('repeat-icon');
+        const artLoader = document.getElementById('art-loader');
+        const progressContainer = document.getElementById('progress-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressThumb = document.getElementById('progress-thumb');
+        const currentTimeDisplay = document.getElementById('current-time');
+        const totalTimeDisplay = document.getElementById('total-time');
+        const trackTitleDisplay = document.getElementById('current-track-title');
+        const trackArtistDisplay = document.getElementById('current-track-artist');
+        const currentAlbumArt = document.getElementById('current-album-art');
+        const volumeContainer = document.getElementById('volume-container');
+        const volumeFill = document.getElementById('volume-fill');
+        const volumeThumb = document.getElementById('volume-thumb');
+        const muteIcon = document.getElementById('mute-icon');
+
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds === null || seconds === undefined) return "00:00";
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function setPlayIcon(isPlay) {
+            if (isPlay) {
+                playIcon.classList.remove('fa-play');
+                playIcon.classList.add('fa-pause');
+            } else {
+                playIcon.classList.remove('fa-pause');
+                playIcon.classList.add('fa-play');
+            }
+        }
+
+        function updateProgressBar(percentage) {
+            const clamped = Math.max(0, Math.min(100, percentage));
+            progressFill.style.width = `${clamped}%`;
+            progressThumb.style.left = `${clamped}%`;
+        }
+
+        function updateVolumeUI(vol) {
+            const clamped = Math.max(0, Math.min(1, vol));
+            currentVolume = clamped;
+            volumeFill.style.width = `${clamped * 100}%`;
+            volumeThumb.style.left = `${clamped * 100}%`;
+
+            if (clamped === 0 || isMuted) {
+                muteIcon.className = "fas fa-volume-mute text-gray-300 text-sm cursor-pointer hover:text-white transition-colors";
+            } else if (clamped < 0.5) {
+                muteIcon.className = "fas fa-volume-down text-gray-300 text-sm cursor-pointer hover:text-white transition-colors";
+            } else {
+                muteIcon.className = "fas fa-volume-up text-gray-300 text-sm cursor-pointer hover:text-white transition-colors";
+            }
+        }
+
+        function setVolume(val) {
+            const clamped = Math.max(0, Math.min(1, val));
+            currentVolume = clamped;
+            isMuted = clamped === 0;
+            audio.volume = clamped;
+            audio.muted = isMuted;
+            updateVolumeUI(clamped);
+        }
+
+        function extractVideoID(url) {
+            if (!url) return null;
+            const regExp = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/;
+            const match = url.match(regExp);
+            return (match && match[1]) ? match[1] : (url.length === 11 ? url : null);
+        }
+
+        function extractPlaylistID(url) {
+            if (!url) return null;
+            url = url.trim();
+            const match = url.match(/[?&]list=([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) return match[1];
+            const directMatch = url.match(/(PL[a-zA-Z0-9_-]+)/);
+            if (directMatch && directMatch[1]) return directMatch[1];
+            return null;
+        }
+
+        /* ==========================================================
+           ১০০% বিজ্ঞাপনহীন অডিও স্ট্রিম প্রক্সি ইঞ্জিন (HIGH-SPEED & RELIABLE)
+           ========================================================== */
+        async function fetchAdFreeAudioStreamUrl(videoId) {
+            const cachedUrl = sessionStorage.getItem('af_stream_' + videoId);
+            if (cachedUrl) return cachedUrl;
+
+            // ভেরিফাইড সক্রিয় ইনভিডিয়াস ও পাইপড এন্ডপয়েন্ট
+            const streamEndpoints = [
+                `https://pipedapi.kavin.rocks/streams/${videoId}`,
+                `https://api.piped.privacy.com.de/streams/${videoId}`,
+                `https://invidious.nerdvpn.de/api/v1/videos/${videoId}?fields=adaptiveFormats`,
+                `https://inv.nadeko.net/api/v1/videos/${videoId}?fields=adaptiveFormats`,
+                `https://yewtu.be/api/v1/videos/${videoId}?fields=adaptiveFormats`
+            ];
+
+            for (const endpoint of streamEndpoints) {
+                // CORS বাইপাস প্রক্সিসহ ট্রাই
+                const testUrls = [
+                    endpoint,
+                    `https://api.allorigins.win/raw?url=${encodeURIComponent(endpoint)}`
+                ];
+
+                for (const url of testUrls) {
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 2600);
+                        const res = await fetch(url, { signal: controller.signal });
+                        clearTimeout(timeoutId);
+
+                        if (!res.ok) continue;
+                        const data = await res.json();
+
+                        // Piped অডিও এক্সট্র্যাক্ট
+                        if (Array.isArray(data.audioStreams) && data.audioStreams.length > 0) {
+                            const bestStream = data.audioStreams.find(s => s.format === 'M4A' || s.mimeType?.includes('audio/mp4')) || data.audioStreams[0];
+                            if (bestStream && bestStream.url) {
+                                sessionStorage.setItem('af_stream_' + videoId, bestStream.url);
+                                return bestStream.url;
+                            }
+                        }
+
+                        // Invidious অডিও এক্সট্র্যাক্ট
+                        if (Array.isArray(data.adaptiveFormats)) {
+                            const audioFormats = data.adaptiveFormats.filter(f => f.type && f.type.startsWith('audio/'));
+                            if (audioFormats.length > 0) {
+                                const bestAudio = audioFormats.find(f => (f.type && f.type.includes('mp4')) || f.container === 'm4a') || audioFormats[0];
+                                if (bestAudio && bestAudio.url) {
+                                    sessionStorage.setItem('af_stream_' + videoId, bestAudio.url);
+                                    return bestAudio.url;
+                                }
+                            }
+                        }
+                    } catch(e) {
+                        // পরবর্তী ইনস্ট্যান্সে চলে যাবে
+                    }
+                }
+            }
+
+            // চূড়ান্ত আল্ট্রা-ফাস্ট ডিরেক্ট অডিও ফলব্যাক লিঙ্ক
+            return `https://invidious.nerdvpn.de/latest_version?id=${videoId}&itag=140&listen=1`;
+        }
+
+        /* ==========================================================
+           গান প্লে করার কোর ফাংশন
+           ========================================================== */
+        window.playTrack = async function(id) {
+            let track = tracks.find(t => t.id === id);
+            if (!track) {
+                for (const listName in playlistsData) {
+                    const found = playlistsData[listName].find(t => t.id === id);
+                    if (found) {
+                        track = found;
+                        break;
+                    }
+                }
+            }
+
+            if (!track) return;
+
+            currentTrackId = track.id;
+            updateProgressBar(0);
+            currentTimeDisplay.textContent = "00:00";
+            totalTimeDisplay.textContent = track.duration || "00:00";
+
+            trackTitleDisplay.textContent = track.title;
+            trackArtistDisplay.textContent = track.artist;
+            currentAlbumArt.src = track.image || 'https://placehold.co/150x150/3c1e0a/ffb450?text=Music';
+
+            const activeJobId = track.id;
+            if (artLoader) artLoader.classList.remove('hidden');
+
+            try {
+                let streamSrc = null;
+
+                if (track.isYoutube) {
+                    const videoId = extractVideoID(track.ytUrl) || track.id.replace('yt_pl_', '').replace('yt_bulk_', '').split('_')[0];
+                    streamSrc = await fetchAdFreeAudioStreamUrl(videoId);
+                } else if (track.url) {
+                    streamSrc = track.url;
+                }
+
+                if (currentTrackId !== activeJobId) return;
+
+                if (streamSrc) {
+                    audio.src = streamSrc;
+                    audio.load();
+                    await audio.play();
+                    isPlaying = true;
+                    setPlayIcon(true);
+                }
+            } catch (err) {
+                console.warn("Playback error handled:", err);
+            } finally {
+                if (artLoader) artLoader.classList.add('hidden');
+                updateActiveTrackUI();
+            }
+
+            renderPlaylist();
+        };
+
+        // Play/Pause বাটনের লজিক
+        playPauseBtn.addEventListener('click', () => {
+            if (!audio.src) {
+                if (tracks.length > 0) {
+                    playTrack(tracks[0].id);
+                }
+                return;
+            }
+
+            if (audio.paused) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    setPlayIcon(true);
+                    updateActiveTrackUI();
+                }).catch(e => console.log(e));
+            } else {
+                audio.pause();
+                isPlaying = false;
+                setPlayIcon(false);
+                updateActiveTrackUI();
+            }
+        });
+
+        function playNextTrack() {
+            if (tracks.length === 0) return;
+            
+            if (repeatMode === 'one') {
+                playTrack(currentTrackId);
+                return;
+            }
+
+            if (isShuffle && tracks.length > 1) {
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * tracks.length);
+                } while (tracks[randomIndex].id === currentTrackId);
+                playTrack(tracks[randomIndex].id);
+                return;
+            }
+
+            const currentIndex = tracks.findIndex(t => t.id === currentTrackId);
+            if (currentIndex !== -1 && currentIndex < tracks.length - 1) {
+                playTrack(tracks[currentIndex + 1].id);
+            } else if (repeatMode === 'all') {
+                playTrack(tracks[0].id);
+            } else {
+                isPlaying = false;
+                setPlayIcon(false);
+                updateActiveTrackUI();
+            }
+        }
+
+        function playPrevTrack() {
+            if (tracks.length === 0) return;
+            const currentIndex = tracks.findIndex(t => t.id === currentTrackId);
+            if (currentIndex > 0) {
+                playTrack(tracks[currentIndex - 1].id);
+            } else {
+                audio.currentTime = 0;
+            }
+        }
+
+        nextBtn.addEventListener('click', playNextTrack);
+        prevBtn.addEventListener('click', playPrevTrack);
+
+        // শাফেল ও রিপিট হ্যান্ডলার
+        if (shuffleBtn) {
+            shuffleBtn.addEventListener('click', () => {
+                isShuffle = !isShuffle;
+                if (isShuffle) {
+                    shuffleBtn.classList.remove('text-gray-400');
+                    shuffleBtn.classList.add('text-[#ffb866]', 'bg-white/10');
+                    shuffleBtn.title = "Shuffle: চালু";
+                } else {
+                    shuffleBtn.classList.remove('text-[#ffb866]', 'bg-white/10');
+                    shuffleBtn.classList.add('text-gray-400');
+                    shuffleBtn.title = "Shuffle: বন্ধ";
+                }
+            });
+        }
+
+        if (repeatBtn) {
+            repeatBtn.addEventListener('click', () => {
+                if (repeatMode === 'all') {
+                    repeatMode = 'one';
+                    repeatBtn.className = "w-[36px] h-[36px] rounded-full text-[#ffb866] bg-white/10 transition-colors flex items-center justify-center relative";
+                    repeatBtn.innerHTML = '<i class="fas fa-repeat text-xs"></i><span class="text-[9px] font-bold absolute -top-1 -right-0.5 text-[#ffaa3c]">1</span>';
+                    repeatBtn.title = "Repeat: এক গান";
+                } else if (repeatMode === 'one') {
+                    repeatMode = 'off';
+                    repeatBtn.className = "w-[36px] h-[36px] rounded-full text-gray-500 hover:text-white transition-colors flex items-center justify-center relative";
+                    repeatBtn.innerHTML = '<i class="fas fa-repeat text-xs"></i>';
+                    repeatBtn.title = "Repeat: বন্ধ";
+                } else {
+                    repeatMode = 'all';
+                    repeatBtn.className = "w-[36px] h-[36px] rounded-full text-[#ffb866] hover:text-white transition-colors flex items-center justify-center relative";
+                    repeatBtn.innerHTML = '<i class="fas fa-repeat text-xs"></i>';
+                    repeatBtn.title = "Repeat: সব গান";
+                }
+            });
+        }
+
+        // অডিও ইভেন্টস
+        audio.addEventListener('play', () => {
+            isPlaying = true;
+            setPlayIcon(true);
+            updateActiveTrackUI();
+        });
+
+        audio.addEventListener('pause', () => {
+            isPlaying = false;
+            setPlayIcon(false);
+            updateActiveTrackUI();
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            if (!isNaN(audio.duration) && audio.duration > 0) {
+                const percentage = (audio.currentTime / audio.duration) * 100;
+                updateProgressBar(percentage);
+                currentTimeDisplay.textContent = formatTime(audio.currentTime);
+                totalTimeDisplay.textContent = formatTime(audio.duration);
+            }
+        });
+
+        audio.addEventListener('ended', playNextTrack);
+
+        // প্রোগ্রেস ও সাউন্ড বার ড্র্যাগ/ক্লিক হ্যান্ডলার
+        function seekAudio(e) {
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            if (!isNaN(audio.duration) && audio.duration > 0) {
+                audio.currentTime = pos * audio.duration;
+                updateProgressBar(pos * 100);
+            }
+        }
+
+        progressContainer.addEventListener('click', seekAudio);
+
+        volumeContainer.addEventListener('click', (e) => {
+            const rect = volumeContainer.getBoundingClientRect();
+            const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            setVolume(pos);
+        });
+
+        muteIcon.addEventListener('click', () => {
+            if (isMuted || currentVolume === 0) {
+                setVolume(0.85);
+            } else {
+                setVolume(0);
+            }
+        });
+
+        // কিবোর্ড শর্টকাট
+        window.addEventListener('keydown', (e) => {
+            const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+            if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') return;
+
+            if (e.code === 'Space') {
+                e.preventDefault();
+                playPauseBtn.click();
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 5);
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                audio.currentTime = Math.max(0, audio.currentTime - 5);
+            } else if (e.code === 'KeyM') {
+                e.preventDefault();
+                muteIcon.click();
+            }
+        });
+
+        // রেন্ডার প্লেলিস্ট UI
+        function renderPlaylist() {
+            const container = document.getElementById('playlist-items');
+            if (!container) return;
+            container.innerHTML = '';
+
+            tracks = playlistsData[currentPlaylistName] || [];
+
+            if (tracks.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-gray-400 text-xs">
+                        <i class="fas fa-music text-2xl mb-2 opacity-50 block"></i>
+                        কোনো গান নেই। ওপরের বাটনে ক্লিক করে গান যোগ করুন।
+                    </div>
+                `;
+            } else {
+                tracks.forEach((track, index) => {
+                    const num = index + 1;
+                    const isActive = track.id === currentTrackId;
+                    const item = document.createElement('div');
+
+                    item.className = `playlist-item flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer mb-1 group ${isActive ? 'active' : ''}`;
+                    item.onclick = () => playTrack(track.id);
+
+                    const ytIcon = track.isYoutube ? '<i class="fab fa-youtube text-red-500 ml-1.5 text-xs"></i>' : '';
+
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3 min-w-0">
+                            <span class="text-xs text-gray-400 w-4 text-center font-medium shrink-0 index-container">${num}</span>
+                            <span class="text-xs font-medium ${isActive ? 'text-[#ff9d33]' : 'text-white'} group-hover:${isActive ? 'text-[#ff9d33]' : 'text-white'} transition-colors truncate max-w-[170px] title-container">${track.title} ${ytIcon}</span>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-[11px] text-gray-400 font-medium truncate max-w-[85px]">${track.artist}</span>
+                            <i class="fas fa-play text-[9px] ${isActive ? 'text-[#ff9d33]' : 'text-gray-400 group-hover:text-white'} transition-colors play-icon-container"></i>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            }
+
+            const titleEl = document.getElementById('playlist-main-title');
+            if (titleEl) {
+                titleEl.textContent = `${currentPlaylistName.toUpperCase()} (${tracks.length})`;
+            }
+
+            updateActiveTrackUI();
+        }
+
+        function updateActiveTrackUI() {
+            document.querySelectorAll('.playlist-item').forEach((item, index) => {
+                const track = tracks[index];
+                if (!track) return;
+
+                const isActive = track.id === currentTrackId;
+                const indexContainer = item.querySelector('.index-container');
+                const titleContainer = item.querySelector('.title-container');
+                const playIconContainer = item.querySelector('.play-icon-container');
+
+                if (isActive) {
+                    item.classList.add('active');
+                    if (titleContainer) {
+                        titleContainer.classList.remove('text-white');
+                        titleContainer.classList.add('text-[#ff9d33]');
+                    }
+                    if (playIconContainer) {
+                        playIconContainer.className = `fas ${isPlaying ? 'fa-pause' : 'fa-play'} text-[9px] text-[#ff9d33] transition-colors play-icon-container`;
+                    }
+                    if (isPlaying && indexContainer) {
+                        indexContainer.innerHTML = `
+                            <div class="flex items-end gap-0.5 h-3 justify-center w-full">
+                                <div class="w-0.5 bg-[#ff9d33] rounded-t-sm h-full animate-[bounce_0.8s_infinite]"></div>
+                                <div class="w-0.5 bg-[#ff9d33] rounded-t-sm h-2/3 animate-[bounce_0.8s_infinite_0.2s]"></div>
+                                <div class="w-0.5 bg-[#ff9d33] rounded-t-sm h-1/2 animate-[bounce_0.8s_infinite_0.4s]"></div>
+                            </div>
+                        `;
+                    } else if (indexContainer) {
+                        indexContainer.innerHTML = `${index + 1}`;
+                    }
+                } else {
+                    item.classList.remove('active');
+                    if (titleContainer) {
+                        titleContainer.classList.remove('text-[#ff9d33]');
+                        titleContainer.classList.add('text-white');
+                    }
+                    if (playIconContainer) {
+                        playIconContainer.className = "fas fa-play text-[9px] text-gray-400 group-hover:text-white transition-colors play-icon-container";
+                    }
+                    if (indexContainer) {
+                        indexContainer.innerHTML = `${index + 1}`;
+                    }
+                }
+            });
+        }
+
+        // ক্যাটাগরি মেনু
+        const categoryDrawer = document.getElementById('playlist-category-drawer');
+        const openCategoryBtn = document.getElementById('open-category-drawer');
+        const closeCategoryBtn = document.getElementById('close-category-drawer');
+
+        window.selectCategory = function(categoryName) {
+            currentPlaylistName = categoryName;
+            tracks = playlistsData[categoryName] || playlistsData['All Tracks'];
+            renderPlaylist();
+            if (categoryDrawer) categoryDrawer.classList.add('-translate-x-full');
+        };
+
+        if (openCategoryBtn && categoryDrawer) {
+            openCategoryBtn.addEventListener('click', () => categoryDrawer.classList.remove('-translate-x-full'));
+        }
+        if (closeCategoryBtn && categoryDrawer) {
+            closeCategoryBtn.addEventListener('click', () => categoryDrawer.classList.add('-translate-x-full'));
+        }
+
+        // প্লেলিস্ট হাইড/শো
+        const toggleBtn = document.getElementById('toggle-playlist');
+        const playlistItems = document.getElementById('playlist-items');
+        const playlistIcon = document.getElementById('playlist-icon');
+        const playlistToggleText = document.getElementById('playlist-toggle-text');
+        const playlistContainer = document.getElementById('playlist-container');
+        let isPlaylistVisible = true;
+
+        if (toggleBtn && playlistItems) {
+            toggleBtn.addEventListener('click', () => {
+                isPlaylistVisible = !isPlaylistVisible;
+                if (isPlaylistVisible) {
+                    playlistItems.style.display = 'block';
+                    if (playlistIcon) playlistIcon.classList.remove('rotate-180');
+                    if (playlistToggleText) playlistToggleText.textContent = 'Hide List';
+                    if (playlistContainer) playlistContainer.style.height = '60vh';
+                } else {
+                    playlistItems.style.display = 'none';
+                    if (playlistIcon) playlistIcon.classList.add('rotate-180');
+                    if (playlistToggleText) playlistToggleText.textContent = 'Show List';
+                    if (playlistContainer) playlistContainer.style.height = 'auto';
+                }
+            });
+        }
+
+        // পাসকোড ও অ্যাড মোডাল লজিক
+        const CORRECT_PASSCODE = "47842828";
+        const passcodeModal = document.getElementById('passcode-modal');
+        const openPasscodeBtn = document.getElementById('open-passcode-modal');
+        const closePasscodeBtn = document.getElementById('close-passcode-modal');
+        const passcodeForm = document.getElementById('passcode-form');
+        const passcodeError = document.getElementById('passcode-error');
+        const inputPasscode = document.getElementById('input-passcode');
+
+        const addModal = document.getElementById('add-modal');
+        const closeAddModalBtn = document.getElementById('close-add-modal');
+        const addSongForm = document.getElementById('add-song-form');
+        const addPlaylistForm = document.getElementById('add-playlist-form');
+        const addBulkForm = document.getElementById('add-bulk-form');
+        const tabSingleBtn = document.getElementById('tab-single-btn');
+        const tabPlaylistBtn = document.getElementById('tab-playlist-btn');
+        const tabBulkBtn = document.getElementById('tab-bulk-btn');
+        const playlistStatusMsg = document.getElementById('playlist-status-msg');
+        const btnFetchPlaylist = document.getElementById('btn-fetch-playlist');
+        const bulkStatusMsg = document.getElementById('bulk-status-msg');
+        const btnFetchBulk = document.getElementById('btn-fetch-bulk');
+
+        function resetTabs() {
+            [tabSingleBtn, tabPlaylistBtn, tabBulkBtn].forEach(btn => {
+                btn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition-all";
+            });
+            [addSongForm, addPlaylistForm, addBulkForm].forEach(f => f.classList.add('hidden'));
+        }
+
+        tabSingleBtn.addEventListener('click', () => {
+            resetTabs();
+            tabSingleBtn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg text-white bg-gradient-to-r from-[#FF8C00] to-[#E65C00] shadow transition-all";
+            addSongForm.classList.remove('hidden');
+        });
+
+        tabPlaylistBtn.addEventListener('click', () => {
+            resetTabs();
+            tabPlaylistBtn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg text-white bg-gradient-to-r from-[#FF8C00] to-[#E65C00] shadow transition-all";
+            addPlaylistForm.classList.remove('hidden');
+        });
+
+        tabBulkBtn.addEventListener('click', () => {
+            resetTabs();
+            tabBulkBtn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg text-white bg-gradient-to-r from-[#FF8C00] to-[#E65C00] shadow transition-all";
+            addBulkForm.classList.remove('hidden');
+        });
+
+        openPasscodeBtn.addEventListener('click', () => {
+            inputPasscode.value = '';
+            passcodeError.classList.add('hidden');
+            passcodeModal.classList.remove('hidden');
+            setTimeout(() => inputPasscode.focus(), 60);
+        });
+
+        closePasscodeBtn.addEventListener('click', () => passcodeModal.classList.add('hidden'));
+
+        passcodeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (inputPasscode.value.trim() === CORRECT_PASSCODE) {
+                passcodeModal.classList.add('hidden');
+                addModal.classList.remove('hidden');
+            } else {
+                passcodeError.classList.remove('hidden');
+                inputPasscode.value = '';
+                inputPasscode.focus();
+            }
+        });
+
+        closeAddModalBtn.addEventListener('click', () => addModal.classList.add('hidden'));
+
+        // সিঙ্গেল গান যোগ করা
+        addSongForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const url = document.getElementById('input-song-url').value.trim();
+            const title = document.getElementById('input-song-title').value.trim();
+            const artist = document.getElementById('input-song-artist').value.trim();
+            const category = document.getElementById('input-song-category').value;
+
+            const ytId = extractVideoID(url);
+            const isYt = !!ytId;
+
+            const newTrack = {
+                id: 'track_' + Date.now(),
+                title: title,
+                artist: artist,
+                duration: "Live",
+                isYoutube: isYt,
+                ytUrl: isYt ? url : null,
+                url: !isYt ? url : null,
+                image: isYt ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : 'https://placehold.co/150x150/3c1e0a/ffb450?text=Music'
+            };
+
+            if (playlistsData[category]) playlistsData[category].push(newTrack);
+            refreshAllTracks();
+            localStorage.setItem('agomoni_user_tracks', JSON.stringify(playlistsData));
+            selectCategory(category);
+            playTrack(newTrack.id);
+
+            addSongForm.reset();
+            addModal.classList.add('hidden');
+        });
+
+        // মেটাডাটা ফেচ ফাংশন
+        async function fetchVideoMetadata(videoId) {
+            try {
+                const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`, { signal: AbortSignal.timeout(3500) });
+                if (res.ok) {
+                    const data = await res.json();
+                    return {
+                        title: data.title || "YouTube Track",
+                        artist: data.author_name || "YouTube Music"
+                    };
+                }
+            } catch(e) {}
+            return {
+                title: "YouTube Track (" + videoId + ")",
+                artist: "YouTube Music"
+            };
+        }
+
+        // সম্পূর্ণ প্লেলিস্ট ফেচ লজিক
+        const PLAYLIST_INSTANCES = [
+            'https://pipedapi.kavin.rocks/playlists/',
+            'https://api.piped.privacy.com.de/playlists/',
+            'https://invidious.nerdvpn.de/api/v1/playlists/',
+            'https://inv.nadeko.net/api/v1/playlists/'
+        ];
+
+        addPlaylistForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const playlistUrl = document.getElementById('input-playlist-url').value.trim();
+            const category = document.getElementById('input-playlist-category').value;
+            const playlistId = extractPlaylistID(playlistUrl);
+
+            if (!playlistId) {
+                alert('সঠিক YouTube Playlist লিংক দিন (যেমন: https://www.youtube.com/playlist?list=PL...)');
+                return;
+            }
+
+            playlistStatusMsg.classList.remove('hidden', 'text-red-400', 'text-green-400');
+            playlistStatusMsg.classList.add('text-orange-300');
+            btnFetchPlaylist.disabled = true;
+            btnFetchPlaylist.classList.add('opacity-50');
+
+            let parsedVideos = null;
+
+            for (let i = 0; i < PLAYLIST_INSTANCES.length; i++) {
+                const instUrl = PLAYLIST_INSTANCES[i] + playlistId;
+                const reqUrls = [
+                    instUrl,
+                    `https://api.allorigins.win/raw?url=${encodeURIComponent(instUrl)}`
+                ];
+
+                for (const u of reqUrls) {
+                    try {
+                        playlistStatusMsg.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> প্লেলিস্ট স্ক্যান করা হচ্ছে (${i + 1}/${PLAYLIST_INSTANCES.length})...`;
+                        const res = await fetch(u, { signal: AbortSignal.timeout(4500) });
+                        if (!res.ok) continue;
+                        const data = await res.json();
+
+                        if (Array.isArray(data.relatedStreams) && data.relatedStreams.length > 0) {
+                            parsedVideos = data.relatedStreams.map(v => ({
+                                videoId: (v.url || '').replace('/watch?v=', ''),
+                                title: v.title || "YouTube Track",
+                                artist: v.uploaderName || data.uploader || "YouTube Music"
+                            })).filter(x => !!x.videoId);
+                            break;
+                        }
+
+                        if (Array.isArray(data.videos) && data.videos.length > 0) {
+                            parsedVideos = data.videos.map(v => ({
+                                videoId: v.videoId,
+                                title: v.title || "YouTube Track",
+                                artist: v.author || data.author || "YouTube Music"
+                            }));
+                            break;
+                        }
+                    } catch(err) {}
+                }
+                if (parsedVideos) break;
+            }
+
+            btnFetchPlaylist.disabled = false;
+            btnFetchPlaylist.classList.remove('opacity-50');
+
+            if (parsedVideos && parsedVideos.length > 0) {
+                playlistStatusMsg.classList.remove('text-orange-300');
+                playlistStatusMsg.classList.add('text-green-400');
+                playlistStatusMsg.innerHTML = `✓ সফলভাবে ${parsedVideos.length}টি গান পাওয়া গেছে!`;
+
+                const formattedTracks = parsedVideos.map((v, idx) => ({
+                    id: 'yt_pl_' + v.videoId + '_' + Date.now() + '_' + idx,
+                    title: v.title,
+                    artist: v.artist,
+                    duration: "Live",
+                    isYoutube: true,
+                    ytUrl: `https://www.youtube.com/watch?v=${v.videoId}`,
+                    image: `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`
+                }));
+
+                if (!playlistsData[category]) playlistsData[category] = [];
+                playlistsData[category].push(...formattedTracks);
+
+                refreshAllTracks();
+                localStorage.setItem('agomoni_user_tracks', JSON.stringify(playlistsData));
+
+                setTimeout(() => {
+                    selectCategory(category);
+                    if (formattedTracks.length > 0) playTrack(formattedTracks[0].id);
+                    addPlaylistForm.reset();
+                    playlistStatusMsg.classList.add('hidden');
+                    addModal.classList.add('hidden');
+                }, 800);
+            } else {
+                playlistStatusMsg.classList.remove('text-orange-300');
+                playlistStatusMsg.classList.add('text-red-400');
+                playlistStatusMsg.innerHTML = '❌ প্লেলিস্টটি ফেচ করা যায়নি। "একাধিক লিংক" ট্যাবে লিংক পেস্ট করে চেষ্টা করুন।';
+            }
+        });
+
+        // একাধিক লিংক বাল্ক ইনপুট
+        addBulkForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = document.getElementById('input-bulk-links').value.trim();
+            const category = document.getElementById('input-bulk-category').value;
+
+            const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+            const videoIds = [];
+
+            lines.forEach(line => {
+                const vid = extractVideoID(line);
+                if (vid && !videoIds.includes(vid)) videoIds.push(vid);
+            });
+
+            if (videoIds.length === 0) {
+                alert('কোনো সঠিক YouTube ভিডিও লিংক পাওয়া যায়নি!');
+                return;
+            }
+
+            bulkStatusMsg.classList.remove('hidden', 'text-red-400', 'text-green-400');
+            bulkStatusMsg.classList.add('text-orange-300');
+            btnFetchBulk.disabled = true;
+            btnFetchBulk.classList.add('opacity-50');
+
+            const formattedTracks = [];
+            for (let i = 0; i < videoIds.length; i++) {
+                const vid = videoIds[i];
+                bulkStatusMsg.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> গান ${i + 1}/${videoIds.length} তথ্য আনা হচ্ছে...`;
+                const meta = await fetchVideoMetadata(vid);
+                formattedTracks.push({
+                    id: 'yt_bulk_' + vid + '_' + Date.now() + '_' + i,
+                    title: meta.title,
+                    artist: meta.artist,
+                    duration: "Live",
+                    isYoutube: true,
+                    ytUrl: `https://www.youtube.com/watch?v=${vid}`,
+                    image: `https://img.youtube.com/vi/${vid}/hqdefault.jpg`
+                });
+            }
+
+            if (!playlistsData[category]) playlistsData[category] = [];
+            playlistsData[category].push(...formattedTracks);
+
+            refreshAllTracks();
+            localStorage.setItem('agomoni_user_tracks', JSON.stringify(playlistsData));
+
+            bulkStatusMsg.classList.remove('text-orange-300');
+            bulkStatusMsg.classList.add('text-green-400');
+            bulkStatusMsg.innerHTML = `✓ ${formattedTracks.length}টি গান সফলভাবে যোগ করা হয়েছে!`;
+
+            btnFetchBulk.disabled = false;
+            btnFetchBulk.classList.remove('opacity-50');
+
+            setTimeout(() => {
+                selectCategory(category);
+                if (formattedTracks.length > 0) playTrack(formattedTracks[0].id);
+                addBulkForm.reset();
+                bulkStatusMsg.classList.add('hidden');
+                addModal.classList.add('hidden');
+            }, 800);
+        });
+
+        // ইনিশিয়ালাইজেশন
+        if (tracks.length > 0) {
+            const initialTrack = tracks[0];
+            currentTrackId = initialTrack.id;
+            trackTitleDisplay.textContent = initialTrack.title;
+            trackArtistDisplay.textContent = initialTrack.artist;
+            if (initialTrack.image) currentAlbumArt.src = initialTrack.image;
+        }
+        setVolume(1);
+        renderPlaylist();
+    </script>
+</body>
+</html>
